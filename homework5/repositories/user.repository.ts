@@ -3,7 +3,7 @@ import { IUser } from "../interfaces/user.interface";
 
 class UserRepository {
     public async getList(): Promise<IUser[]> {
-        return await User.find({});
+        return await User.find({isDeleted:false});
     }
 
     public async create(dto: Partial<IUser>): Promise<IUser> {

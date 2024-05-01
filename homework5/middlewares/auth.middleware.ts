@@ -16,7 +16,7 @@ class AuthMiddleware {
             if (!accessToken) {
                 throw new ApiError("No token provided", 401);
             }
-            const payload = tokenService.checkToken(accessToken);
+            const payload = tokenService.checkToken(accessToken,TokenTypeEnum.ACCESS);
 
             const tokenPair = await tokenRepository.findByParams({ accessToken });
             if (!tokenPair) {
