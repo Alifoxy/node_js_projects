@@ -14,7 +14,7 @@ router.post(
 );
 router.post(
     "/sign-in",
-    userMiddleware.isUserValid(UserValidator.create),
+    userMiddleware.isUserValid(UserValidator.login),
     authController.signIn,
 );
 router.post(

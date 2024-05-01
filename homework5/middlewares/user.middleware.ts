@@ -3,6 +3,7 @@ import { isObjectIdOrHexString } from "mongoose";
 
 import { ApiError } from "../errors/api-error";
 import {ObjectSchema} from "joi";
+import {userRepository} from "../repositories/user.repository";
 
 class UserMiddleware {
     public isIdValid(req: Request, res: Response, next: NextFunction) {
@@ -29,6 +30,12 @@ class UserMiddleware {
             }
         }
 
+    }
+    public async isEmailExist(email: string): Promise<void> {
+        const user = await userRepository.getByParams({ email });
+        if (user) {
+            throw new ApiError("email already exist", 409);
+        }
     }
 }
 

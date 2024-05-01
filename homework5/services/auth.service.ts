@@ -6,12 +6,13 @@ import { userRepository } from "../repositories/user.repository";
 import { passwordService } from "./password.service";
 import { tokenService } from "./token.service";
 import {IJWTPayload} from "../interfaces/jwt-payload.interface";
+import {userMiddleware} from "../middlewares/user.middleware";
 
 class AuthService {
     public async signUp(
         dto: Partial<IUser>,
     ): Promise<{ user: IUser; tokens: ITokenResponse }> {
-        await this.isEmailExist(dto.email);
+        await userMiddleware.isEmailExist(dto.email);
         const hashedPassword = await passwordService.hashPassword(dto.password);
         const user = await userRepository.create({
             ...dto,
@@ -74,16 +75,6 @@ class AuthService {
         });
         return newPair;
     }
-
-
-    private async isEmailExist(email: string): Promise<void> {
-        const user = await userRepository.getByParams({ email });
-        if (user) {
-            throw new ApiError("email already exist", 409);
-        }
-    }
-
-
 }
 
 export const authService = new AuthService();
