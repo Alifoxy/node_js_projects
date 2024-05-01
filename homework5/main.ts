@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 
-import { ApiError } from "./api-error";
+import { ApiError } from "./errors/api-error";
 import { userRouter } from "./routers/user.router";
 import {config} from "./configs/config";
 import mongoose from "mongoose";
