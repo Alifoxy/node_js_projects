@@ -8,9 +8,19 @@ import {UserValidator} from "../validators/user.validator";
 const router = Router();
 
 router.get("/", userController.getList);
-
+router.post(
+    "/",
+    userMiddleware.isUserValid(UserValidator.create),
+    userController.create,
+);
 router.get("/:userId", userMiddleware.isIdValid, userController.getById);
-router.put("/:userId", userMiddleware.isIdValid, userController.updateById);
+router.put(
+    "/:userId",
+    userMiddleware.isUserValid(UserValidator.update),
+    userMiddleware.isIdValid,
+    userController.updateById);
+
+
 router.get("/me", authMiddleware.checkAccessToken, userController.getMe);
 router.put(
     "/me",

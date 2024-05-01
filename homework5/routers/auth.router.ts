@@ -14,7 +14,7 @@ router.post(
 );
 router.post(
     "/sign-in",
-    // commonMiddleware.isBodyValid(UserValidator.create),
+    userMiddleware.isUserValid(UserValidator.create),
     authController.signIn,
 );
 router.post(
