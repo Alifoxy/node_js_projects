@@ -9,6 +9,8 @@ export const config = {
 
     HASH_ROUNDS: Number(process.env.HASH_ROUNDS),
 
+    FRONT_URL: process.env.FRONT_URL,
+
     SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
     SENDGRID_FROM_EMAIL: process.env.SENDGRID_FROM_EMAIL,
 

@@ -7,6 +7,9 @@ import { passwordService } from "./password.service";
 import { tokenService } from "./token.service";
 import {IJWTPayload} from "../interfaces/jwt-payload.interface";
 import {userMiddleware} from "../middlewares/user.middleware";
+import {sendGridService} from "./send-grid.service";
+import {EmailTypeEnum} from "../enums/email-type.enum";
+import {config} from "../configs/config";
 
 class AuthService {
     public async signUp(
@@ -28,6 +31,13 @@ class AuthService {
             refreshToken: tokens.refreshToken,
             _userId: user._id,
         });
+
+        await sendGridService.sendByType(user.email, EmailTypeEnum.WELCOME, {
+            name: dto.name,
+            frontUrl: config.FRONT_URL,
+            actionToken: "actionToken",
+        });
+
         return { user, tokens };
     }
 
