@@ -13,10 +13,11 @@ import {config} from "../configs/config";
 import {IForgot, ISetForgot} from "../interfaces/action-token.interface";
 import {actionTokenRepository} from "../repositories/action-token.repository";
 import {ActionTokenTypeEnum} from "../enums/action-token-type.enum";
-import {errorMessages} from "../contants/error-messages.constant";
-import {statusCodes} from "../contants/status-codes.constant";
+// import {errorMessages} from "../contants/error-messages.constant";
+// import {statusCodes} from "../contants/status-codes.constant";
 
 class AuthService {
+    private Promise: any;
 
     public async signUp(
         dto: Partial<IUser>,
@@ -38,11 +39,23 @@ class AuthService {
             _userId: user._id,
         });
 
-        await sendGridService.sendByType(user.email, EmailTypeEnum.WELCOME, {
-            name: dto.name,
-            frontUrl: config.FRONT_URL,
-            actionToken: "actionToken",
+        const actionToken = tokenService.generateActionToken(
+            { userId: user._id, role: user.role },
+            ActionTokenTypeEnum.VERIFY,
+        );
+        await actionTokenRepository.create({
+            tokenType: ActionTokenTypeEnum.VERIFY,
+            actionToken,
+            _userId: user._id,
         });
+        
+        await this.Promise.all([
+            sendGridService.sendByType(user.email, EmailTypeEnum.WELCOME, {
+                name: dto.name,
+                frontUrl: config.FRONT_URL,
+                actionToken,
+            }),
+        ]);
 
         return { user, tokens };
     }
@@ -137,15 +150,15 @@ class AuthService {
         return user;
     }
 
-    private async isEmailExist(email: string): Promise<void> {
-        const user = await userRepository.getByParams({ email, isDeleted: true });
-        if (user) {
-            throw new ApiError(
-                errorMessages.EMAIL_ALREADY_EXIST,
-                statusCodes.CONFLICT,
-            );
-        }
-    }
+    // private async isEmailExist(email: string): Promise<void> {
+    //     const user = await userRepository.getByParams({ email, isDeleted: true });
+    //     if (user) {
+    //         throw new ApiError(
+    //             errorMessages.EMAIL_ALREADY_EXIST,
+    //             statusCodes.CONFLICT,
+    //         );
+    //     }
+    // }
 }
 
 export const authService = new AuthService();

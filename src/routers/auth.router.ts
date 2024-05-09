@@ -28,7 +28,6 @@ router.post(
     userMiddleware.isUserValid(UserValidator.forgotPassword),
     authController.forgotPassword,
 );
-let commonMiddleware;
 router.put(
     "/forgot-password",
     userMiddleware.isUserValid(UserValidator.setForgotPassword),
