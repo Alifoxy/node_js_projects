@@ -5,6 +5,8 @@ import { ApiError } from "../errors/api-error";
 import { IJWTPayload } from "../interfaces/jwt-payload.interface";
 import { ITokenResponse } from "../interfaces/token.interface";
 import {TokenTypeEnum} from "../enums/token-type.enum";
+import {ActionTokenTypeEnum} from "../enums/action-token-type.enum";
+import {statusCodes} from "../contants/status-codes.constant";
 
 class TokenService {
     public generatePair(payload: IJWTPayload): ITokenResponse {
@@ -42,6 +44,60 @@ class TokenService {
 
         } catch (error) {
             throw new ApiError("Token is not valid", 401);
+        }
+    }
+    public generateActionToken(
+        payload: IJWTPayload,
+        type: ActionTokenTypeEnum,
+    ): string {
+        let secret: string;
+        let expiresIn: string;
+
+        switch (type) {
+            case ActionTokenTypeEnum.FORGOT:
+                secret = config.JWT_ACTION_FORGOT_TOKEN_SECRET;
+                expiresIn = config.JWT_ACTION_FORGOT_EXPIRES_IN;
+                break;
+            case ActionTokenTypeEnum.VERIFY:
+                secret = config.JWT_ACTION_VERIFY_TOKEN_SECRET;
+                expiresIn = config.JWT_ACTION_VERIFY_EXPIRES_IN;
+                break;
+
+            default:
+                throw new ApiError(
+                    "Invalid token type",
+                    statusCodes.INTERNAL_SERVER_ERROR,
+                );
+        }
+        return jsonwebtoken.sign(payload, secret, { expiresIn });
+    }
+
+    public checkActionToken(
+        token: string,
+        type: ActionTokenTypeEnum,
+    ): IJWTPayload {
+        try {
+            let secret: string;
+
+            switch (type) {
+                case ActionTokenTypeEnum.FORGOT:
+                    secret = config.JWT_ACTION_FORGOT_TOKEN_SECRET;
+                    break;
+
+                case ActionTokenTypeEnum.VERIFY:
+                    secret = config.JWT_ACTION_VERIFY_TOKEN_SECRET;
+                    break;
+
+                default:
+                    throw new ApiError(
+                        "Invalid token type",
+                        statusCodes.INTERNAL_SERVER_ERROR,
+                    );
+            }
+
+            return jsonwebtoken.verify(token, secret) as IJWTPayload;
+        } catch (error) {
+            throw new ApiError("Token is not valid", statusCodes.UNAUTHORIZED);
         }
     }
 }

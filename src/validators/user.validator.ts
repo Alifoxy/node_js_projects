@@ -19,4 +19,12 @@ export class UserValidator {
         password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
     })
 
+    public static forgotPassword = Joi.object({
+        email: Joi.string().lowercase().trim().email().required(),
+    });
+
+    public static setForgotPassword = Joi.object({
+        password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+    });
+
 };

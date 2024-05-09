@@ -4,6 +4,9 @@ import { TokenTypeEnum } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api-error";
 import { tokenRepository } from "../repositories/token.repository";
 import { tokenService } from "../services/token.service";
+import {ActionTokenTypeEnum} from "../enums/action-token-type.enum";
+import {statusCodes} from "../contants/status-codes.constant";
+import {actionTokenRepository} from "../repositories/action-token.repository";
 
 class AuthMiddleware {
     public async checkAccessToken(
@@ -54,6 +57,29 @@ class AuthMiddleware {
         } catch (e) {
             next(e);
         }
+    }
+
+    public checkActionToken(type: ActionTokenTypeEnum, key = "token") {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                const actionToken = req.query[key] as string;
+                if (!actionToken) {
+                    throw new ApiError("No token provided", statusCodes.BAD_REQUEST);
+                }
+                const payload = tokenService.checkActionToken(actionToken, type);
+
+                const entity = await actionTokenRepository.findByParams({
+                    actionToken,
+                });
+                if (!entity) {
+                    throw new ApiError("Invalid token", statusCodes.UNAUTHORIZED);
+                }
+                req.res.locals.jwtPayload = payload;
+                next();
+            } catch (e) {
+                next(e);
+            }
+        };
     }
 }
 

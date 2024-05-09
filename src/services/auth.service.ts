@@ -10,8 +10,14 @@ import {userMiddleware} from "../middlewares/user.middleware";
 import {sendGridService} from "./send-grid.service";
 import {EmailTypeEnum} from "../enums/email-type.enum";
 import {config} from "../configs/config";
+import {IForgot, ISetForgot} from "../interfaces/action-token.interface";
+import {actionTokenRepository} from "../repositories/action-token.repository";
+import {ActionTokenTypeEnum} from "../enums/action-token-type.enum";
+import {errorMessages} from "../contants/error-messages.constant";
+import {statusCodes} from "../contants/status-codes.constant";
 
 class AuthService {
+
     public async signUp(
         dto: Partial<IUser>,
     ): Promise<{ user: IUser; tokens: ITokenResponse }> {
@@ -84,6 +90,61 @@ class AuthService {
             _userId: jwtPayload.userId,
         });
         return newPair;
+    }
+
+    public async forgotPassword(dto: IForgot): Promise<void> {
+        const user = await userRepository.getByParams({ email: dto.email });
+        if (!user) return;
+
+        const actionToken = tokenService.generateActionToken(
+            { userId: user._id, role: user.role },
+            ActionTokenTypeEnum.FORGOT,
+        );
+        await actionTokenRepository.create({
+            tokenType: ActionTokenTypeEnum.FORGOT,
+            actionToken,
+            _userId: user._id,
+        });
+        await sendGridService.sendByType(user.email, EmailTypeEnum.RESET_PASSWORD, {
+            frontUrl: config.FRONT_URL,
+            actionToken,
+        });
+    }
+
+    public async setForgotPassword(
+        dto: ISetForgot,
+        jwtPayload: IJWTPayload,
+    ): Promise<void> {
+        const user = await userRepository.getById(jwtPayload.userId);
+        const hashedPassword = await passwordService.hashPassword(dto.password);
+
+        await userRepository.updateById(user._id, { password: hashedPassword });
+        await actionTokenRepository.deleteByParams({
+            tokenType: ActionTokenTypeEnum.FORGOT,
+        });
+        await tokenRepository.deleteByParams({ _userId: user._id });
+    }
+
+    public async verify(jwtPayload: IJWTPayload): Promise<IUser> {
+        const [user] = await this.Promise.all([
+            userRepository.updateById(jwtPayload.userId, {
+                isVerified: true,
+            }),
+            actionTokenRepository.deleteByParams({
+                tokenType: ActionTokenTypeEnum.VERIFY,
+            }),
+        ]);
+        return user;
+    }
+
+    private async isEmailExist(email: string): Promise<void> {
+        const user = await userRepository.getByParams({ email, isDeleted: true });
+        if (user) {
+            throw new ApiError(
+                errorMessages.EMAIL_ALREADY_EXIST,
+                statusCodes.CONFLICT,
+            );
+        }
     }
 }
 

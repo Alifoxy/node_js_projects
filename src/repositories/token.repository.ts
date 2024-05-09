@@ -2,6 +2,7 @@ import { FilterQuery } from "mongoose";
 
 import { IToken } from "../interfaces/token.interface";
 import { Token } from "../models/token.model";
+import {ActionToken} from "../models/action-token.model";
 
 class TokenRepository {
     public async create(dto: IToken): Promise<IToken> {
@@ -12,6 +13,9 @@ class TokenRepository {
     }
     public async deleteById(id: string): Promise<void> {
         await Token.deleteOne({ _id: id });
+    }
+    public async deleteByParams(params: FilterQuery<IToken>): Promise<void> {
+        await ActionToken.deleteMany(params);
     }
 }
 
