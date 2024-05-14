@@ -11,7 +11,14 @@
     "removeComments": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "lib": [
+      "decorators",
+      "dom",
+      "es5",
+      "scripthost",
+      "es2015.promise"
+    ]
   },
   "exclude": [
     "node_modules"
