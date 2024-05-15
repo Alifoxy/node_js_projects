@@ -5,7 +5,7 @@ import { IUser } from "../interfaces/user.interface";
 import { authService } from "../services/auth.service";
 import {IForgot, ISetForgot} from "../interfaces/action-token.interface";
 import {UserPresenter} from "../presenters/user.presenter";
-import {statusCodes} from "../contants/status-codes.constant";
+import {statusCodes} from "../constants/status-codes.constant";
 
 class AuthController {
     public async signUp(req: Request, res: Response, next: NextFunction) {

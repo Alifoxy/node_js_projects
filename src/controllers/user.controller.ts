@@ -3,6 +3,8 @@ import { NextFunction, Request, Response } from "express";
 import { userService } from "../services/user.service";
 import { IUser } from "../interfaces/user.interface";
 import {IJWTPayload} from "../interfaces/jwt-payload.interface";
+import {UploadedFile} from "express-fileupload";
+import {UserPresenter} from "../presenters/user.presenter";
 
 class UserController {
     public async getList(req: Request, res: Response, next: NextFunction) {
@@ -82,6 +84,31 @@ class UserController {
             const jwtPayload = req.res.locals.jwtPayload as IJWTPayload;
             await userService.deleteMe(jwtPayload.userId);
             res.sendStatus(204);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    public async uploadAvatar(req: Request, res: Response, next: NextFunction) {
+        try {
+            const jwtPayload = req.res.locals.jwtPayload as IJWTPayload;
+            const avatar = req.files?.avatar as UploadedFile;
+
+            const user = await userService.uploadAvatar(jwtPayload.userId, avatar);
+            const response = UserPresenter.toPrivateResponseDto(user);
+            res.status(201).json(response);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    public async deleteAvatar(req: Request, res: Response, next: NextFunction) {
+        try {
+            const jwtPayload = req.res.locals.jwtPayload as IJWTPayload;
+
+            const user = await userService.deleteAvatar(jwtPayload.userId);
+            const response = UserPresenter.toPrivateResponseDto(user);
+            res.status(201).json(response);
         } catch (e) {
             next(e);
         }

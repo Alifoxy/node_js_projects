@@ -6,7 +6,7 @@ import { IJWTPayload } from "../interfaces/jwt-payload.interface";
 import { ITokenResponse } from "../interfaces/token.interface";
 import {TokenTypeEnum} from "../enums/token-type.enum";
 import {ActionTokenTypeEnum} from "../enums/action-token-type.enum";
-import {statusCodes} from "../contants/status-codes.constant";
+import {statusCodes} from "../constants/status-codes.constant";
 
 class TokenService {
     public generatePair(payload: IJWTPayload): ITokenResponse {

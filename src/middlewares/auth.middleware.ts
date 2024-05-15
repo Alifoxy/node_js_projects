@@ -5,7 +5,7 @@ import { ApiError } from "../errors/api-error";
 import { tokenRepository } from "../repositories/token.repository";
 import { tokenService } from "../services/token.service";
 import {ActionTokenTypeEnum} from "../enums/action-token-type.enum";
-import {statusCodes} from "../contants/status-codes.constant";
+import {statusCodes} from "../constants/status-codes.constant";
 import {actionTokenRepository} from "../repositories/action-token.repository";
 
 class AuthMiddleware {

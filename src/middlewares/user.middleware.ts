@@ -4,8 +4,8 @@ import { isObjectIdOrHexString } from "mongoose";
 import { ApiError } from "../errors/api-error";
 import {ObjectSchema} from "joi";
 import {userRepository} from "../repositories/user.repository";
-import {errorMessages} from "../contants/error-messages.constant";
-import {statusCodes} from "../contants/status-codes.constant";
+import {errorMessages} from "../constants/error-messages.constant";
+import {statusCodes} from "../constants/status-codes.constant";
 
 class UserMiddleware {
     public isIdValid(req: Request, res: Response, next: NextFunction) {

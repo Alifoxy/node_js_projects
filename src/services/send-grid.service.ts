@@ -2,7 +2,7 @@ import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 import SendGrid from "@sendgrid/mail";
 
 import { config } from "../configs/config";
-import { emailTemplateConstant } from "../contants/email-template.constant";
+import { emailTemplateConstant } from "../constants/email-template.constant";
 import { EmailTypeEnum } from "../enums/email-type.enum";
 import { EmailTypeToPayloadType } from "../types/email-type-to-payload.type";
 

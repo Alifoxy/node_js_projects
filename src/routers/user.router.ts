@@ -4,6 +4,7 @@ import { userController } from "../controllers/user.controller";
 import { userMiddleware } from "../middlewares/user.middleware";
 import {authMiddleware} from "../middlewares/auth.middleware";
 import {UserValidator} from "../validators/user.validator";
+import {fileMiddleware} from "../middlewares/file.middleware";
 
 const router = Router();
 
@@ -28,6 +29,20 @@ router.put(
     userMiddleware.isUserValid(UserValidator.update),
     userController.updateMe,
 );
+
+router.post(
+    "/me/avatar",
+    authMiddleware.checkAccessToken,
+    fileMiddleware.isAvatarValid,
+    userController.uploadAvatar,
+);
+
+router.delete(
+    "/me/avatar",
+    authMiddleware.checkAccessToken,
+    userController.deleteAvatar,
+);
+
 router.delete("/me", authMiddleware.checkAccessToken, userController.deleteMe);
 router.delete(
     "/:userId",
